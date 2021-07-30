@@ -79,5 +79,5 @@ DerivedDataCache/*
 .idea/
 .vscode/
 
-*.uasset
-*.umap
+#Assets to compress later
+assets/
