@@ -34,43 +34,59 @@ void AMovingPlatform::BeginPlay()
 	
 }
 
+void AMovingPlatform::AddActiveTrigger()
+{
+	ActiveTriggers++;
+}
+
+void AMovingPlatform::RemoveActiveTrigger()
+{
+	if(ActiveTriggers > 0)
+	{
+		ActiveTriggers--;
+	}
+}
+
 //Tick Event Implementation ***********************
 void AMovingPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	//If User is the server we should Move the platform otherwise not :
-	//The Code is running only on server 
-	if(HasAuthority())
+	if(ActiveTriggers>0)
 	{
-		//Getting Actor Location 
-		FVector Location = GetActorLocation();
-
-		//Getting the lenght of vector between Start and target location 
-		float JourneyLenght =  (GlobalTargetLocation-GlobalStartLocation).Size();
-
-		//The lenght of the vector between current location and startLocation 
-		float JourneyTraveled = (Location-GlobalStartLocation).Size();
-
-
-		if(JourneyTraveled >= JourneyLenght)
+		//If User is the server we should Move the platform otherwise not :
+		//The Code is running only on server 
+		if(HasAuthority())
 		{
-			FVector Swap = GlobalStartLocation;
-			GlobalStartLocation=GlobalTargetLocation;
-			GlobalTargetLocation=Swap;
+		
+			//Getting Actor Location 
+			FVector Location = GetActorLocation();
+
+			//Getting the lenght of vector between Start and target location 
+			float JourneyLenght =  (GlobalTargetLocation-GlobalStartLocation).Size();
+
+			//The lenght of the vector between current location and startLocation 
+			float JourneyTraveled = (Location-GlobalStartLocation).Size();
+
+
+			if(JourneyTraveled >= JourneyLenght)
+			{
+				FVector Swap = GlobalStartLocation;
+				GlobalStartLocation=GlobalTargetLocation;
+				GlobalTargetLocation=Swap;
+			}
+		
+			/*Getting the Direction where we should move our platform
+			* normalizing the direction because function called every tick
+			*we want platform to move continuisly until reach target */
+		
+			FVector Direction = (GlobalTargetLocation-GlobalStartLocation).GetSafeNormal();
+
+			//Set the new Location to the speed multiplied by deltaTime and Direction 
+			Location += Speed*DeltaTime*Direction;
+
+			//Setting Actor New Location
+			SetActorLocation(Location);
+		
 		}
-		
-		/*Getting the Direction where we should move our platform
-		* normalizing the direction because function called every tick
-		*we want platform to move continuisly until reach target */
-		
-		FVector Direction = (GlobalTargetLocation-GlobalStartLocation).GetSafeNormal();
-
-		//Set the new Location to the speed multiplied by deltaTime and Direction 
-		Location += Speed*DeltaTime*Direction;
-
-		//Setting Actor New Location
-		SetActorLocation(Location);
-		
 	}
 }
