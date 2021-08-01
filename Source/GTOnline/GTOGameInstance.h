@@ -15,13 +15,27 @@ class GTONLINE_API UGTOGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	//Game instance contructor
 	UGTOGameInstance(const FObjectInitializer& ObjectInitializer);
 
+	//Game instance init 
 	virtual void Init() override;
 
+	//Load Menu function Call 
+    UFUNCTION(BlueprintCallable)
+	void LoadMenu();
+
+	//Hosting Game function call 
 	UFUNCTION(Exec)
 	void Host();
 
+	//Joining Game function call 
 	UFUNCTION(Exec)
 	void Join(const FString& Address );
+
+	
+private:
+
+	//Create Menu class to link to Menu BluePrint
+	TSubclassOf<class UUserWidget> MenuClass;
 };
