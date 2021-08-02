@@ -6,6 +6,7 @@
 
 #include "TriggerPlatform.h"
 
+//Game instance Constructor
 UGTOGameInstance::UGTOGameInstance(const FObjectInitializer& ObjectInitializer)
 {
 	// getting hold of trigger platform BP  class 
@@ -18,6 +19,7 @@ UGTOGameInstance::UGTOGameInstance(const FObjectInitializer& ObjectInitializer)
 	MenuClass = MenuBPClass.Class;
 }
 
+//Game instance init function implementation 
 void UGTOGameInstance::Init()
 {
 	UE_LOG(LogTemp,Warning,TEXT("Found Class %s"), *MenuClass->GetName());
@@ -36,6 +38,28 @@ void UGTOGameInstance::LoadMenu()
 
 	// Add Menu to view port 
 	Menu->AddToViewport();
+
+	//Getting Player controller  
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+
+	// Ensure PlayerController is not Nullptr 
+	if(!ensure(PlayerController != nullptr)) return;
+
+	//Initiate an Input Mode Data as FInputModeUIOnly
+	FInputModeUIOnly InputeModeData;
+
+	//Setting the widget to focus ad the Menu widget the function needs an SWidget so we use the Function
+	//TakeWidget to convert UUserWidget to  SWidget
+	InputeModeData.SetWidgetToFocus(Menu->TakeWidget());
+
+	//then we lock Mouse to View port as do not lock 
+	InputeModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+
+	// then set inputMode in the player controller 
+	PlayerController->SetInputMode(InputeModeData);
+	//show Mouse Cursor 
+	PlayerController->bShowMouseCursor=true;
+	
 }
 
 // Hosting Game Function implementation 
@@ -52,23 +76,32 @@ void UGTOGameInstance::Host()
 
 	//Server Travel Implementation
 	UWorld* World = GetWorld();
+	//Ensure World is not Nullptr
 	if(!ensure(World != nullptr)) return;
 
+	//Server Travel to Map as a listen as a server for incoming connections
 	World->ServerTravel("/Game/_Game/assets/Maps/ThirdPersonExampleMap?listen");
 }
 
+//Join Game Function implementation 
 void UGTOGameInstance::Join(const FString& Address)
 {
+	//Getting engine 
 	UEngine* Engine = GetEngine();
 
+	//Ensure engine is not Nullptr 
 	if(!ensure(Engine != nullptr)) return;
 
+
+	//Add debug Message in screen 
 	Engine->AddOnScreenDebugMessage(0,2,FColor::Red,  FString::Printf(TEXT("Joining %s"),*Address));
 
 	//Client travel 
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
 
+	// Ensure PlayerController is not Nullptr 
 	if(!ensure(PlayerController != nullptr)) return;
 
+	//Client Travel to address as Absolute travel type 
 	PlayerController->ClientTravel(Address,ETravelType::TRAVEL_Absolute);
 }
