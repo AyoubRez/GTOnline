@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include  "MenuSystem/MenuInterface.h"
+
 #include "GTOGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GTONLINE_API UGTOGameInstance : public UGameInstance
+class GTONLINE_API UGTOGameInstance : public UGameInstance, public  IMenuInterface
 {
 	GENERATED_BODY()
 
@@ -38,4 +40,6 @@ private:
 
 	//Create Menu class to link to Menu BluePrint
 	TSubclassOf<class UUserWidget> MenuClass;
+
+	class UMainMenu* Menu;
 };
