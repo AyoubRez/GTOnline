@@ -6,6 +6,8 @@
 
 #include "TriggerPlatform.h"
 #include "MenuSystem/MainMenu.h"
+#include "MenuSystem/MenuWidget.h"
+
 
 //Game instance Constructor
 UGTOGameInstance::UGTOGameInstance(const FObjectInitializer& ObjectInitializer)
@@ -18,6 +20,15 @@ UGTOGameInstance::UGTOGameInstance(const FObjectInitializer& ObjectInitializer)
 
 	//Set MenuClass to MenuBPClass that we got from ContructorHelpers FindClass function 
 	MenuClass = MenuBPClass.Class;
+	
+	// getting hold of trigger platform BP  class 
+	ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuBPClass(TEXT("/Game/_Game/MenuSystem/WBP_InGameMenu"));
+
+	//Ensure MenuBPClass is not nullptr 
+	if(!ensure(InGameMenuBPClass.Class!=nullptr)) return;
+
+	//Set MenuClass to MenuBPClass that we got from Contructor Helpers FindClass function 
+	InGameMenuClass = InGameMenuBPClass.Class;
 }
 
 //Game instance init function implementation 
@@ -39,6 +50,20 @@ void UGTOGameInstance::LoadMenu()
 	Menu->Setup();
 	Menu->SetMenuInterface(this);
 	
+}
+
+void UGTOGameInstance::InGameLoadMenu()
+{
+	//Ensure MenuClass is not a nullptr
+	if(!ensure(InGameMenuClass!=nullptr)) return;
+
+	// Create UuserWidget Menu from MenuClass 
+	UMenuWidget* InGameMenu = CreateWidget<UMenuWidget>(this,InGameMenuClass);
+	
+	//Ensure Menu is not nullptr
+	if(!ensure(InGameMenu!=nullptr)) return;
+	InGameMenu->Setup();
+	InGameMenu->SetMenuInterface(this);
 }
 
 // Hosting Game Function implementation 
@@ -69,6 +94,10 @@ void UGTOGameInstance::Host()
 //Join Game Function implementation 
 void UGTOGameInstance::Join(const FString& Address)
 {
+	if(Menu!=nullptr)
+	{
+		Menu->Teardown();
+	}
 	//Getting engine 
 	UEngine* Engine = GetEngine();
 
@@ -87,4 +116,16 @@ void UGTOGameInstance::Join(const FString& Address)
 
 	//Client Travel to address as Absolute travel type 
 	PlayerController->ClientTravel(Address,ETravelType::TRAVEL_Absolute);
+}
+
+void UGTOGameInstance::LoadMainMenu()
+{
+	//Client travel 
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+
+	// Ensure PlayerController is not Nullptr 
+	if(!ensure(PlayerController != nullptr)) return;
+
+	//Client Travel to address as Absolute travel type 
+	PlayerController->ClientTravel("/Game/_Game/assets/Maps/MainMenu",ETravelType::TRAVEL_Absolute);
 }

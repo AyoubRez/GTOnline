@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "MenuInterface.h"
+#include "MenuWidget.h"
+
 
 #include "MainMenu.generated.h"
 
@@ -12,17 +12,10 @@
  * 
  */
 UCLASS()
-class GTONLINE_API UMainMenu : public UUserWidget
+class GTONLINE_API UMainMenu : public UMenuWidget
 {
 	GENERATED_BODY()
-
-	public:
-	void SetMenuInterface(IMenuInterface* VMenuInterface);
-
-	void Setup();
-
-	void Teardown();
-
+	
 	protected:
 	virtual bool Initialize();
 
@@ -32,6 +25,9 @@ class GTONLINE_API UMainMenu : public UUserWidget
 
 	UPROPERTY(meta=(BindWidget))
 	class UButton* JoinButton;
+
+	UPROPERTY(meta=(BindWidget))
+	class UButton* QuitButton;
 
 	UPROPERTY(meta=(BindWidget))
 	class UButton* ConfirmJoinMenuButton;
@@ -56,6 +52,9 @@ class GTONLINE_API UMainMenu : public UUserWidget
 
 	UFUNCTION()
 	void JoinServer();
+
+	UFUNCTION()
+	void Quit();
 	
 	UFUNCTION()
 	void OpenJoinMenu();
@@ -63,6 +62,6 @@ class GTONLINE_API UMainMenu : public UUserWidget
 	UFUNCTION()
 	void OpenMainMenu();
 
-	IMenuInterface* MenuInterface;
+
 	
 };
