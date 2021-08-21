@@ -4,13 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include  "MenuSystem/MenuInterface.h"
+
 #include "GTOGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GTONLINE_API UGTOGameInstance : public UGameInstance
+class GTONLINE_API UGTOGameInstance : public UGameInstance, public  IMenuInterface
 {
 	GENERATED_BODY()
 
@@ -25,17 +27,30 @@ public:
     UFUNCTION(BlueprintCallable)
 	void LoadMenu();
 
+	//Load Menu function Call 
+	UFUNCTION(BlueprintCallable)
+	void InGameLoadMenu();
+
 	//Hosting Game function call 
 	UFUNCTION(Exec)
-	void Host();
+	void Host() override;
 
 	//Joining Game function call 
 	UFUNCTION(Exec)
-	void Join(const FString& Address );
+	void Join(const FString& Address ) override;
+
+	virtual void LoadMainMenu() override;
 
 	
 private:
 
 	//Create Menu class to link to Menu BluePrint
 	TSubclassOf<class UUserWidget> MenuClass;
+
+	//Create Menu class to link to Menu BluePrint
+	TSubclassOf<class UUserWidget> InGameMenuClass;
+
+	class UMainMenu* Menu;
+
+	
 };
